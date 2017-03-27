@@ -23,5 +23,8 @@
 #               ./data/HMQCP/: Post-processing count data and the prior information obtained using @MInter
 #               For HMASM, it includes both species interactions and co-occurrance prior information.
 #-------------------------------------------------------------------------------
+
+
 Quick start:
 source Demo_Synthetic.R or Demo_HMP.R in Rstudio.
+
