@@ -57,6 +57,30 @@ ROC_eval <- function(label, pred){
   return(list("perf" = perf, "auc" = auc, "aucsd" = aucstd));
 }
 
+ROC_new <- function(label, pred){
+  
+  pred <- prediction(pred, label)
+  perf <- performance(pred,"tpr","fpr")
+  auc <- performance(pred, 'auc')
+  aucstd <- sd(simplify2array(auc@y.values))
+  auc <- mean(simplify2array(auc@y.values))
+  f <- performance(pred,"prec","rec")
+  x <- f@x.values
+  y <- f@y.values
+
+  AUCPr = matrix(0,length(x), 1);
+  for (i in 1:length(x)){
+    xTemp <- as.matrix(x[[i]])
+    yTemp <- as.matrix(y[[i]])
+    yTemp[1] <- yTemp[2];
+    AUCPr[i] = trapz(xTemp, yTemp)
+    f@y.values[[i]][1] <- f@y.values[[i]][2];
+  }
+  aucpr <- mean(AUCPr)
+  aucprsd <- sd(AUCPr)
+
+  return(list("perf" = perf, "auc" = auc, "aucsd" = aucstd, "f" = f, "aucpr" = aucpr, "aucprsd" = aucprsd));
+}
 
 
 acc_eval <- function(label, pred){

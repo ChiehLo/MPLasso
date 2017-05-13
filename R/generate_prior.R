@@ -1,99 +1,89 @@
-generatePrior <- function(sample, prior, precision){
+generate_prior <- function(sample, prior, precision){
   p <- ncol(sample$sample);
   n <- nrow(sample$sample);
   adj <- sample$adj;
-  rho_inter <- matrix(1, p, p);
-  diag(rho_inter) <- 0
-  rho_occur <- matrix(0, p, p);
+  rhoInter <- matrix(1, p, p);
+  diag(rhoInter) <- 0
+  rhoOccur <- matrix(0, p, p);
   # type 1: know the interaction, i.e., know adj[i,j] == 1 
   if (prior >= 0 && precision > 0){
-    precision_ratio <- precision
+    precisionRatio <- precision
     # 1 for 
-    rho_inter <- matrix(1, p, p); #gLasso regularizer
-    diag(rho_inter) <- 0
+    rhoInter <- matrix(1, p, p); #gLasso regularizer
+    diag(rhoInter) <- 0
     # generate the constriant matrix 
-    count_penalized <- 0
-    total_count <- 0
+    countPenalized <- 0
+    totalCount <- 0
     for (i in 1:p){
       for (j in 1:p){
         if (abs(adj[i,j]) == 1 && runif(1, min=0, max=1) > prior && i != j){
-          rho_inter[i,j] <- 0;
-          #rho_inter[j,i] <- 0;
-          if(runif(1, min=0, max=1) > (1- precision_ratio) ){
-            count_penalized <- count_penalized + 1
-            rho_inter[i,j] <- 1;
-            #rho_inter[j,i] <- 1;
+          rhoInter[i,j] <- 0;
+          if(runif(1, min=0, max=1) > (1- precisionRatio) ){
+            countPenalized <- countPenalized + 1
+            rhoInter[i,j] <- 1;
           }
-          total_count <- total_count + 1
+          totalCount <- totalCount + 1
         }
       }
     }
-    print(count_penalized)
-    print(total_count)
-    while (count_penalized > 0){
+    #print(countPenalized)
+    #print(totalCount)
+    while (countPenalized > 0){
       row = round(runif(1, min = 1, max = p))
       col = round(runif(1, min = 1, max = p))
-      if(row!=col && rho_inter[row, col]==1){
-        rho_inter[row,col] = 0;
-        #rho_inter[col,row] = 0;
-        count_penalized <- count_penalized -1
+      if(row!=col && rhoInter[row, col]==1){
+        rhoInter[row,col] = 0;
+        countPenalized <- countPenalized -1
       }
     }
-    print(count_penalized)
+    print(countPenalized)
   }
   
-  # type 2: know non interacting edges, i.e., adj[i,j] == 0
+  # type 2: know non interacting edges, i.e., adj[i,j] == 0 (i.e., from co-occurrence method)
   if (prior >= 0 && precision > 0){
-    precision_ratio <- precision
-    rho_occur <- matrix(0, p, p); #gLasso regularizer
+    precisionRatio <- precision
+    rhoOccur <- matrix(0, p, p); #gLasso regularizer
     # generate the constriant matrix
-    count_penalized <- 0
-    total_count <- 0
+    countPenalized <- 0
+    totalCount <- 0
     for (i in 1:p){
       for (j in 1:p){
         if (abs(adj[i,j]) == 0 && runif(1, min=0, max=1) > prior && i != j){
-          rho_occur[i,j] <- 1;
-          #rho_occur[j,i] <- 1;
-          if(runif(1, min=0, max=1) > (1- precision_ratio) ){
-            count_penalized <- count_penalized + 1
-            rho_occur[i,j] <- 0;
-            #rho_occur[j,i] <- 0;
+          rhoOccur[i,j] <- 1;
+          if(runif(1, min=0, max=1) > (1- precisionRatio) ){
+            countPenalized <- countPenalized + 1
+            rhoOccur[i,j] <- 0;
           }
-          total_count <- total_count + 1
+          totalCount <- totalCount + 1
         }
       }
     }
     print('type2:')
-    print(total_count)
-    print(count_penalized)
-    counts <- 5000000;
-    while(count_penalized > 1000){
+    print(totalCount)
+    print(countPenalized)
+    while(countPenalized > 0){
       row = round(runif(1, min = 1, max = p))
       col = round(runif(1, min = 1, max = p))
-      if(row!=col && rho_occur[row, col]==0){
-        rho_occur[row,col] = 1;
-        #rho_occur[col,row] = 1;
-        count_penalized <- count_penalized -1
+      if(row!=col && rhoOccur[row, col]==0){
+        rhoOccur[row,col] = 1;
+        countPenalized <- countPenalized -1
       }
-      counts <- counts - 1;
     }
-    print(count_penalized)
+    print(countPenalized)
   }
   
   if(prior>=0 && precision == 0){
-    rho_inter <- matrix(1, p, p); #gLasso regularizer
+    rhoInter <- matrix(1, p, p); #gLasso regularizer
     for (i in 1:p){
       for (j in 1:p){
         if (abs(adj[i,j]) == 1 && runif(1, min=0, max=1) > prior && i!=j){
-          rho_inter[i,j] <- 0;
-          #rho_inter[j,i] <- 0;
+          rhoInter[i,j] <- 0;
         }
         if (abs(adj[i,j]) == 0 && runif(1, min=0, max=1) > prior && i != j){
-          rho_occur[i,j] <- 1;
-          #rho_occur[j,i] <- 1;
+          rhoOccur[i,j] <- 1;
         }
       }
     }
   }
-  return(list("rho_inter" = rho_inter, "rho_occur" = rho_occur));
+  return(list("rhoInter" = rhoInter, "rhoOccur" = rhoOccur));
 }

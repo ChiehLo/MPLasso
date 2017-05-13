@@ -5,7 +5,7 @@
 # @date 01/26/2017
 #####################################################################
 
-selection <- function(sample, type = "PLasso", prior = 1, priorType = TRUE, interactionFlag = FALSE){
+selection <- function(sample, type = "MPLasso", prior = 1, priorType = TRUE, interactionFlag = FALSE, precision=FALSE, precisionRatio = 0.5, priorInfo){
   p <- ncol(sample$sample);
   n <- nrow(sample$sample);
   
@@ -16,7 +16,7 @@ selection <- function(sample, type = "PLasso", prior = 1, priorType = TRUE, inte
   BICResult = matrix(0, numLambda, 1);
   
   for (i in 1:numLambda){
-    result <- PLasso(sample, lambdaMin = (lambdaMin+(i-1)*interval), lambdaMax = 10, prior, priorType = priorType, interactionFlag = interactionFlag);
+    result <- MPLasso(sample, lambdaMin = (lambdaMin+(i-1)*interval), lambdaMax = 10, prior = prior, priorType = priorType, interactionFlag = interactionFlag, precision=precision, precisionRatio = precisionRatio, priorInfo = priorInfo);
     BICResult[i] <- BIC(sample, result);
   } 
   return(BICResult);
