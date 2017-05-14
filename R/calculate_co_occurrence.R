@@ -10,12 +10,17 @@ occurance <- function(occuPath, totalPaper = 615268){
   countTable <- as.matrix(a)
   n = nrow(countTable);
   pValue = matrix(0, n, n);
+  CILow = matrix(0, n, n);
+  CIHigh = matrix(0, n, n);
   totalPaper = sum(diag(countTable))
   for (i in 1:n){
     for (j in 1:n){
       if (j>i){
         contingency <- matrix(c(countTable[i,j], countTable[j,j] , countTable[i, i], totalPaper), nrow = 2)
-        pValue[i,j] <- fisher.test(contingency, alternative = "two.sided")$p.value;
+        temp <- fisher.test(contingency, alternative = "two.sided");
+        pValue[i,j] <- temp$p.value;
+        CILow[i,j] <- temp$conf.int[[1]];
+        CIHigh[i,j] <- temp$conf.int[[2]];
       }
     }
   }
@@ -25,7 +30,7 @@ occurance <- function(occuPath, totalPaper = 615268){
   corrected <- matrix(adjust, ncol=n, nrow = n);
   for (i in 1:n){
     for (j in 1:n){
-      if (j>i && corrected[i,j] == 1){
+      if (j>i && (CIHigh[i,j] > 1 && CILow[i,j] < 1) && corrected[i,j] == 1){
         noAssociation[i,j] <- 1;
         noAssociation[j,i] <- 1;
       }

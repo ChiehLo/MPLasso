@@ -32,7 +32,7 @@ source(paste(scriptDir, '/R/normalization.R', sep = ''))
 
 # five body sites considered in this demo
 bodySites <- c('Anterior_nares', 'Buccal_mucosa', 'Stool', 'Supragingival_plaque', 'Tongue_dorsum')
-
+bodySites <- c('Anterior_nares')
 # flag for evaluating different datasets
 HMASM = TRUE;
 HMMCP = TRUE;
@@ -59,9 +59,9 @@ if (HMASM == TRUE){
     
     prior = 0;
     interactionFlag = TRUE;
-    selectLambda <- selection(sample, type="PLasso", prior = prior, interactionFlag = interactionFlag);
+    selectLambda <- selection(sample, type="MPLasso", prior = prior, interactionFlag = interactionFlag);
     lambdaOptimal <- (which.min(selectLambda)-1)*0.01 + 0.01;
-    resultPL <- algorithm_select(sample, lambdaMin = lambdaOptimal, prior = prior, type = "PLasso", interactionFlag = interactionFlag);
+    resultPL <- algorithm_select(sample, lambdaMin = lambdaOptimal, prior = prior, type = "MPLasso", interactionFlag = interactionFlag);
     
     nInt <- 2;
     reproduceErrorArrayPL = matrix(0,nInt, 4); 
@@ -72,16 +72,16 @@ if (HMASM == TRUE){
         sampleIndex <- sort(sample.int(numSample, round(0.5*numSample)))
         subSample$sample <- subSample$sample[sampleIndex,]
         lassoSub <- fraction_data_process(subSample$sample, 1 - NoAssociation, interactionMatrix)
-        selectLambda <- selection(lassoSub, type="PLasso", prior = prior, interactionFlag = interactionFlag);
+        selectLambda <- selection(lassoSub, type="MPLasso", prior = prior, interactionFlag = interactionFlag);
         lambdaOptimal <- (which.min(selectLambda)-1)*0.01 + 0.01;
-        resultPLSample <- algorithm_select(lassoSub, lambdaMin = lambdaOptimal, prior = prior, type = "PLasso", interactionFlag = interactionFlag);
+        resultPLSample <- algorithm_select(lassoSub, lambdaMin = lambdaOptimal, prior = prior, type = "MPLasso", interactionFlag = interactionFlag);
         reproduceErrorPL <- repro_eval(resultPL$adj, resultPLSample$adj)
         reproduceErrorArrayPL[k,] <- reproduceErrorPL;
        
       }
       meanPL <- colMeans(1-reproduceErrorArrayPL)
       stdPL <- colSds(1-reproduceErrorArrayPL)
-      print("PLasso HMASM Evaluation Results: 25% (std), 50% (std), 75% (std), 100% (std)")
+      print("MPLasso HMASM Evaluation Results: 25% (std), 50% (std), 75% (std), 100% (std)")
       print(sprintf("%.3f (%.3f) & %.3f (%.3f) & %.3f (%.3f) & %.3f (%.3f)", meanPL[1], stdPL[1], meanPL[2], stdPL[2], meanPL[3], stdPL[3], meanPL[4], stdPL[4]))
     }
   }  
@@ -101,9 +101,9 @@ if (HMMCP == TRUE){
     
     prior = 0;
     interactionFlag = FALSE;
-    selectLambda <- selection(sample, type="PLasso", prior = prior, interactionFlag = interactionFlag);
+    selectLambda <- selection(sample, type="MPLasso", prior = prior, interactionFlag = interactionFlag);
     lambdaOptimal <- (which.min(selectLambda)-1)*0.01 + 0.01;
-    resultPLMM <- algorithm_select(sample, lambdaMin = lambdaOptimal, prior = prior, type = "PLasso", interactionFlag = interactionFlag);
+    resultPLMM <- algorithm_select(sample, lambdaMin = lambdaOptimal, prior = prior, type = "MPLasso", interactionFlag = interactionFlag);
     nInt <- 2;
     reproduceErrorArrayPL = matrix(0,nInt, 4);
     if (repro == TRUE){
@@ -113,15 +113,15 @@ if (HMMCP == TRUE){
         sampleIndex <- sort(sample.int(numSample, round(0.5*numSample)))
         subSample$sample <- subSample$sample[sampleIndex,]
         lassoSub <- count_data_process(subSample$sample, 1 - noAssociation)
-        selectLambda <- selection(lassoSub, type="PLasso", prior = prior, interactionFlag = interactionFlag);
+        selectLambda <- selection(lassoSub, type="MPLasso", prior = prior, interactionFlag = interactionFlag);
         lambdaOptimal <- (which.min(selectLambda)-1)*0.01 + 0.01;
-        resultPLSample <- algorithm_select(lassoSub, lambdaMin = lambdaOptimal, prior = prior, type = "PLasso", interactionFlag = interactionFlag);
+        resultPLSample <- algorithm_select(lassoSub, lambdaMin = lambdaOptimal, prior = prior, type = "MPLasso", interactionFlag = interactionFlag);
         reproduceErrorPL <- repro_eval(resultPLMM$adj, resultPLSample$adj)
         reproduceErrorArrayPL[k,] <- reproduceErrorPL;     
       }
       meanPL <- colMeans(1-reproduceErrorArrayPL)
       stdPL <- colSds(1-reproduceErrorArrayPL)
-      print("PLasso HMMCP Evaluation Results: 25% (std), 50% (std), 75% (std), 100% (std)")
+      print("MPLasso HMMCP Evaluation Results: 25% (std), 50% (std), 75% (std), 100% (std)")
       print(sprintf("%.3f (%.3f) & %.3f (%.3f) & %.3f (%.3f) & %.3f (%.3f)", meanPL[1], stdPL[1], meanPL[2], stdPL[2], meanPL[3], stdPL[3], meanPL[4], stdPL[4]))
     }
     
@@ -142,9 +142,9 @@ if (HMQCP == TRUE){
     
     prior = 0;
     interactionFlag = FALSE;
-    selectLambda <- selection(sample, type="PLasso", prior = prior, interactionFlag = interactionFlag);
+    selectLambda <- selection(sample, type="MPLasso", prior = prior, interactionFlag = interactionFlag);
     lambdaOptimal <- (which.min(selectLambda)-1)*0.01 + 0.01;
-    resultPLMQ <- algorithm_select(sample, lambdaMin = lambdaOptimal, prior = prior, type = "PLasso", interactionFlag = interactionFlag);
+    resultPLMQ <- algorithm_select(sample, lambdaMin = lambdaOptimal, prior = prior, type = "MPLasso", interactionFlag = interactionFlag);
     nInt <- 2;
     reproduceErrorArrayPL = matrix(0,nInt, 4);
     if (repro == TRUE){
@@ -154,16 +154,16 @@ if (HMQCP == TRUE){
         sampleIndex <- sort(sample.int(numSample, round(0.5*numSample)))
         subSample$sample <- subSample$sample[sampleIndex,]
         lassoSub <- count_data_process(subSample$sample, 1 - noAssociation)
-        selectLambda <- selection(lassoSub, type="PLasso", prior = prior, interactionFlag = interactionFlag);
+        selectLambda <- selection(lassoSub, type="MPLasso", prior = prior, interactionFlag = interactionFlag);
         lambdaOptimal <- (which.min(selectLambda)-1)*0.01 + 0.01;
-        resultPLSample <- algorithm_select(lassoSub, lambdaMin = lambdaOptimal, prior = prior, type = "PLasso", interactionFlag = interactionFlag);
+        resultPLSample <- algorithm_select(lassoSub, lambdaMin = lambdaOptimal, prior = prior, type = "MPLasso", interactionFlag = interactionFlag);
         reproduceErrorPL <- repro_eval(resultPLMQ$adj, resultPLSample$adj)
         reproduceErrorArrayPL[k,] <- reproduceErrorPL;
 
       }
       meanPL <- colMeans(1-reproduceErrorArrayPL)
       stdPL <- colSds(1-reproduceErrorArrayPL)
-      print("PLasso HMQCP Evaluation Results: 25% (std), 50% (std), 75% (std), 100% (std)")
+      print("MPLasso HMQCP Evaluation Results: 25% (std), 50% (std), 75% (std), 100% (std)")
       print(sprintf("%.3f (%.3f) & %.3f (%.3f) & %.3f (%.3f) & %.3f (%.3f)", meanPL[1], stdPL[1], meanPL[2], stdPL[2], meanPL[3], stdPL[3], meanPL[4], stdPL[4]))
     }
     
